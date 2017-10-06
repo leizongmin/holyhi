@@ -1,0 +1,40 @@
+{
+  "name": "holyhi",
+  "version": "1.0.0",
+  "description": "state management library that very easy to use",
+  "main": "dist/lib/index.js",
+  "typing": "dist/lib/index.d.ts",
+  "files": [
+    "dist/lib"
+  ],
+  "dependencies": {
+    "@types/immutable": "^3.8.7",
+    "immutable": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.43",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "tslint-config-lei": "^1.1.1",
+    "typescript": "^2.5.3"
+  },
+  "scripts": {
+    "test": "mocha --require ts-node/register src/test/**/*.test.ts",
+    "clean": "rm -rf dist",
+    "compile": "tsc",
+    "prepublish": "npm run clean && npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leizongmin/holyhi.git"
+  },
+  "author": "Zongmin Lei <leizongmin@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leizongmin/holyhi/issues"
+  },
+  "homepage": "https://github.com/leizongmin/holyhi#readme"
+}
