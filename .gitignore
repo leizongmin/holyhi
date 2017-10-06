@@ -58,3 +58,4 @@ typings/
 .env
 
 dist
+src/examples/**/entry.js
