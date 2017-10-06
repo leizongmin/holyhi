@@ -31,6 +31,10 @@ store.setState({
 subscriber.unsubscribe();
 ```
 
+## Examples
+
+See [the examples source directory](https://github.com/leizongmin/holyhi/tree/master/src/examples)
+
 ## License
 
 ```text
