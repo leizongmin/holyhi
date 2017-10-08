@@ -39,7 +39,7 @@ import { createStore } from 'holyhi';
 const store = createStore({});
 
 // subscribe for fields changed
-const subscriber = store.forFields('a', 'b').subscribe(fields => {
+const subscriber = store.subscribe(['a', 'b'], fields => {
   console.log('fields changed: %s', fields);
 });
 

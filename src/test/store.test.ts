@@ -6,7 +6,7 @@ describe('holyhi', function () {
   it('no initial state', function () {
     const s = createStore();
     const ret: string[][] = [];
-    const a = s.allFields().subscribe((fields) => {
+    const a = s.subscribe([], (fields) => {
       ret.push(fields);
     });
 
@@ -49,9 +49,9 @@ describe('holyhi', function () {
     const fall: string[][] = [];
     const fa: string[][] = [];
     const fbc: string[][] = [];
-    const sall = s.allFields().subscribe(fields => fall.push(fields));
-    const sa = s.forFields('a').subscribe(fields => fa.push(fields));
-    const sbc = s.forFields('b', 'c').subscribe(fields => fbc.push(fields));
+    const sall = s.subscribe([], fields => fall.push(fields));
+    const sa = s.subscribe(['a'], fields => fa.push(fields));
+    const sbc = s.subscribe(['b', 'c'], fields => fbc.push(fields));
 
     s.setState({ x: 111 });
     s.setState({ a: 123 });
