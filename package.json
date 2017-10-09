@@ -27,6 +27,9 @@
     "typescript": "^2.5.3",
     "webpack": "^3.6.0"
   },
+  "peerDependencies": {
+    "react": "^16.0.0"
+  },
   "scripts": {
     "test": "mocha --require ts-node/register src/test/**/*.test.ts",
     "clean": "rm -rf dist",

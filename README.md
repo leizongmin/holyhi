@@ -53,6 +53,48 @@ store.setState({
 subscriber.unsubscribe();
 ```
 
+React:
+
+```typescript
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { createStore, Provider, State } from 'holyhi';
+
+const store = createStore({
+  a: 123,
+  b: 456,
+  c: 789,
+});
+ReactDOM.render((
+  <Provider store={store}>
+    <State
+      subscribe={['a', 'b']}
+      render={(state, update) => (
+        <App a={state.a} b={state.b}/>
+      )}
+    />
+    <App />
+  </Provider>
+), document.getElementById('root'));
+
+class App extends React.Component {
+  render() {
+    return (
+      <State
+        subscribe={['a','b']}
+        render={(state, update) => (
+          <div>
+            A: <input />
+            B: <input />
+            <span>{state.a + state.b}</span>
+          </div>
+        )}
+      />
+    );
+  }
+}
+```
+
 ## Examples
 
 See [the examples source directory](https://github.com/leizongmin/holyhi/tree/master/src/examples)

@@ -10,7 +10,7 @@ import * as immutable from 'immutable';
 export type Listener = (fields: string[]) => void;
 
 // field name for all listeners
-export const LISTENER_ALL = '@@holyhi/ALL';
+export const LISTENER_ALL_FIELDS = '@@holyhi/ALL_FIELDS';
 
 export class Store {
 
@@ -26,7 +26,7 @@ export class Store {
   }
 
   public setState(state: any): void {
-    let callbacks: Listener[] = this.listeners.get(LISTENER_ALL) || [];
+    let callbacks: Listener[] = this.listeners.get(LISTENER_ALL_FIELDS) || [];
     const fields: string[] = [];
     for (const name in state) {
       fields.push(name);
@@ -40,6 +40,10 @@ export class Store {
       const list = new Set(callbacks);
       list.forEach(fn => fn(fields));
     }
+  }
+
+  public field(name: string): StateField {
+    return new StateField(this, name);
   }
 
   public subscribe(fields: string[], callback: Listener): Subscriber {
@@ -85,7 +89,7 @@ export class Subscriber {
   private callback: Listener;
 
   constructor(private store: Store, fields: string[]) {
-    this.fields = fields.length > 0 ? fields.slice() : [LISTENER_ALL];
+    this.fields = fields.length > 0 ? fields.slice() : [LISTENER_ALL_FIELDS];
   }
 
   public subscribe(callback: Listener): this {
@@ -103,8 +107,93 @@ export class Subscriber {
     delete this.listening;
   }
 
+  public emit(fields: any[] = []): this {
+    this.callback(fields);
+    return this;
+  }
+
 }
 
 export function createStore(initialState: any = {}): Store {
   return new Store(initialState);
+}
+
+export class StateField {
+
+  constructor(private store: Store, public name: string) { }
+
+  public subscribe(callback: (newValue: any) => void): Subscriber {
+    return this.store.subscribe([this.name], () => callback(this.get()));
+  }
+
+  public set(value: any): this {
+    this.store.setState({ [this.name]: value });
+    return this;
+  }
+
+  public get(): any {
+    return this.store.getState()[this.name];
+  }
+
+  private getArray(): any[] | undefined {
+    const a = this.get() as any[];
+    if (!Array.isArray(a)) {
+      throw new TypeError(`state field "${this.name}" is not an array`);
+    }
+    return a;
+  }
+
+  public push(...items: any[]): this {
+    const a = this.getArray();
+    if (a) {
+      a.push(...items);
+      this.set(a);
+    }
+    return this;
+  }
+
+  public pop(): any {
+    const a = this.getArray();
+    if (a) {
+      const v = a.pop();
+      this.set(a);
+      return v;
+    }
+  }
+
+  public shift(): any {
+    const a = this.getArray();
+    if (a) {
+      const v = a.shift();
+      this.set(a);
+      return v;
+    }
+  }
+
+  public unshift(...items: any[]): this {
+    const a = this.getArray();
+    if (a) {
+      a.unshift(...items);
+      this.set(a);
+    }
+    return this;
+  }
+
+  public splice(start: number, deleteCount?: number): this {
+    const a = this.getArray();
+    if (a) {
+      a.splice(start, deleteCount);
+      this.set(a);
+    }
+    return this;
+  }
+
+  public add(n: number): this {
+    return this.set(this.get() + n);
+  }
+
+  public sub(n: number): this {
+    return this.set(this.get() - n);
+  }
+
 }

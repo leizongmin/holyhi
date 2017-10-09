@@ -21,10 +21,7 @@ class TodoItem extends React.Component<TodoItemProps> {
       <div className='todo-item'>
         <span>{this.props.message}</span>
         <button onClick={() => {
-          const store = this.props.store;
-          const list = store.getState().list as string[];
-          list.splice(this.props.index, 1);
-          store.setState({ list });
+          this.props.store.field('list').splice(this.props.index, 1);
         }}>X</button>
       </div>
     );
@@ -34,10 +31,8 @@ class TodoItem extends React.Component<TodoItemProps> {
 class TodoList extends React.Component<Props, TodoListState> {
   private subscriber: Subscriber;
   componentWillMount() {
-    this.setState({ list: this.props.store.getState().list });
-    this.subscriber = this.props.store.forFields('list').subscribe(() => {
-      this.setState({ list: this.props.store.getState().list });
-    });
+    const update = () => this.setState({ list: this.props.store.field('list').get() });
+    this.subscriber = this.props.store.subscribe(['list'], update).emit();
   }
   componentWillUnmount() {
     this.subscriber.unsubscribe();
@@ -58,13 +53,10 @@ class TodoList extends React.Component<Props, TodoListState> {
 
 class App extends React.Component<Props> {
   add() {
-    const store = this.props.store;
     const input = this.refs.input as HTMLInputElement;
     const msg = input.value;
     if (!msg) return;
-    const list = store.getState().list as string[];
-    list.unshift(msg);
-    store.setState({ list });
+    this.props.store.field('list').unshift(msg);
     input.value = '';
   }
   render() {
@@ -95,7 +87,7 @@ function saveStateToLocalStorage(state: any) {
 }
 
 const store = createStore(loadStateFromLocalStorage());
-store.allFields().subscribe(() => saveStateToLocalStorage(store.getState()));
+store.subscribe([], () => saveStateToLocalStorage(store.getState()));
 
 const app = ReactDOM.render((
   <App store={store} />
