@@ -139,6 +139,11 @@ export class StateField {
     return this.store.getState()[this.name];
   }
 
+  public remove(): this {
+    this.store.setState({ [this.name]: undefined });
+    return this;
+  }
+
   private getArray(): any[] | undefined {
     const a = this.get() as any[];
     if (!Array.isArray(a)) {

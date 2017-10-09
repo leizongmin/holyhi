@@ -140,7 +140,7 @@ describe('holyhi', function () {
       s.destroy();
     });
 
-    it('get / set', function () {
+    it('get / set / remove', function () {
       const s = createStore({ a: 111 });
 
       expect(s.field('b').get()).to.equal(undefined);
@@ -150,6 +150,9 @@ describe('holyhi', function () {
       expect(s.field('a').get()).to.equal(111);
       s.field('a').set(789);
       expect(s.field('a').get()).to.equal(789);
+
+      expect(s.field('a').remove().get()).to.equal(undefined);
+      expect(s.field('a').get()).to.equal(undefined);
 
       s.destroy();
     });
