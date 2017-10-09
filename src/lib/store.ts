@@ -43,7 +43,7 @@ export class Store {
   }
 
   public subscribe(fields: string[], callback: Listener): Subscriber {
-    return new Subscriber(this).subscribe(fields, callback);
+    return new Subscriber(this, fields).subscribe(callback);
   }
 
   public addListener(fields: string[], callback: Listener): void {
@@ -84,10 +84,11 @@ export class Subscriber {
   private fields: string[];
   private callback: Listener;
 
-  constructor(private store: Store) { }
-
-  public subscribe(fields: string[], callback: Listener): this {
+  constructor(private store: Store, fields: string[]) {
     this.fields = fields.length > 0 ? fields.slice() : [LISTENER_ALL];
+  }
+
+  public subscribe(callback: Listener): this {
     this.callback = callback;
     this.store.addListener(this.fields, this.callback);
     this.listening = true;
