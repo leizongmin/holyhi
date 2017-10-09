@@ -3,6 +3,7 @@ const webpack = require('webpack');
 module.exports = {
   entry: {
     example1: './example1/index.tsx',
+    example2: './example2/index.tsx',
   },
   output: {
     path: __dirname,

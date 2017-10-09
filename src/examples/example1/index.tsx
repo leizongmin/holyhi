@@ -42,7 +42,7 @@ class TodoList extends React.Component<Props, TodoListState> {
       <div className='todo-list'>
         {this.state.list.map((item, index) => <TodoItem
           store={this.props.store}
-          key={item}
+          key={index + item}
           message={item}
           index={index}
         />)}

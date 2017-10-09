@@ -55,10 +55,10 @@ subscriber.unsubscribe();
 
 React:
 
-```typescript
+```tsx
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, Provider, State } from 'holyhi';
+import { createStore, Store, Provider, State } from 'holyhi';
 
 const store = createStore({
   a: 123,
@@ -69,28 +69,35 @@ ReactDOM.render((
   <Provider store={store}>
     <State
       subscribe={['a', 'b']}
-      render={(state, update) => (
-        <App a={state.a} b={state.b}/>
+      render={(state, store) => (
+        <App a={state.a} b={state.b} store={store} />
       )}
     />
     <App />
   </Provider>
 ), document.getElementById('root'));
 
-class App extends React.Component {
+interface AppProps {
+  a: number;
+  b: number;
+  store: Store;
+}
+
+class App extends React.Component<AppProps> {
   render() {
     return (
-      <State
-        subscribe={['a','b']}
-        render={(state, update) => (
-          <div>
-            A: <input />
-            B: <input />
-            <span>{state.a + state.b}</span>
-          </div>
-        )}
-      />
+      <div>
+        A: <input ref='a' />
+        B: <input ref='b' />
+        <button onClick={() => this.getResult()}>=</button>
+        <span>{state.a + state.b}</span>
+      </div>
     );
+  }
+  getResult() {
+    const a = Number(this.refs.a.value);
+    const b = Number(this.refs.a.value);
+    this.props.store.setState({ a, b });
   }
 }
 ```

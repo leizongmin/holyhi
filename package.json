@@ -9,7 +9,9 @@
   ],
   "dependencies": {
     "@types/immutable": "^3.8.7",
-    "immutable": "^3.8.2"
+    "@types/prop-types": "^15.5.2",
+    "immutable": "^3.8.2",
+    "prop-types": "^15.6.0"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",
@@ -35,7 +37,8 @@
     "clean": "rm -rf dist",
     "compile": "tsc",
     "prepublish": "npm run clean && npm run compile",
-    "build-examples": "cd src/examples && webpack"
+    "build-examples": "cd src/examples && webpack",
+    "build-examples-watch": "cd src/examples && webpack -w"
   },
   "repository": {
     "type": "git",
