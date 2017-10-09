@@ -28,14 +28,18 @@ export class Store {
   public setState(state: any): void {
     let callbacks: Listener[] = this.listeners.get(LISTENER_ALL_FIELDS) || [];
     const fields: string[] = [];
+
+    let newState = this.state;
     for (const name in state) {
       fields.push(name);
-      this.state = this.state.set(name, state[name]);
+      newState = newState.set(name, state[name]);
       const list = this.listeners.get(name);
       if (Array.isArray(list)) {
         callbacks = callbacks.concat(list);
       }
     }
+    this.state = newState;
+
     if (callbacks.length > 0) {
       const list = new Set(callbacks);
       list.forEach(fn => fn(fields));
