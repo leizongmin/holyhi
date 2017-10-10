@@ -106,16 +106,26 @@ export interface SubscribeDecoratorOptions {
   mapStore?: string;
 }
 
+function emptyFunction() { /**/ }
+
+function getStoreFromComponentInstance(thisArgs: any): Store {
+  return thisArgs.context[CONTEXT_NAME] && thisArgs.context[CONTEXT_NAME].store;
+}
+
+function ensureConsturctor(constructor: any) {
+  if (constructor.__holyhi__) {
+    throw new Error(`cannot use @subscribe() and @mapStore() in the same time`);
+  }
+  constructor.__holyhi__ = true;
+}
+
 export function subscribe(options: SubscribeDecoratorOptions) {
   const fields = options.fields || [];
   const mapState = options.mapState || ((s) => s);
   const mapStore = options.mapStore || '__holyhi__store';
 
   return function (constructor: any) {
-    function emptyFunction() { /**/ }
-    function getStore(thisArgs: any): Store {
-      return thisArgs.context[CONTEXT_NAME] && thisArgs.context[CONTEXT_NAME].store;
-    }
+    ensureConsturctor(constructor);
 
     constructor.contextTypes = {
       ...constructor.contextTypes,
@@ -125,7 +135,7 @@ export function subscribe(options: SubscribeDecoratorOptions) {
     constructor.prototype.componentWillMount = constructor.prototype.componentWillMount || emptyFunction;
     constructor.prototype.__hohyhi__componentWillMount = constructor.prototype.componentWillMount;
     constructor.prototype.componentWillMount = function () {
-      const store = getStore(this);
+      const store = getStoreFromComponentInstance(this);
       if (store) {
         this[mapStore] = store;
         this.__holyhi__subscribe = store.subscribe(fields, () => this.setState(mapState(store.getState()))).emit();
@@ -137,6 +147,28 @@ export function subscribe(options: SubscribeDecoratorOptions) {
     constructor.prototype.componentWillUnmount = function () {
       if (this.__holyhi__subscribe) {
         this.__holyhi__subscribe.unsubscribe();
+      }
+    };
+
+    return constructor;
+  };
+}
+
+export function mapStore(name: string = '__holyhi__store') {
+  return function (constructor: any) {
+    ensureConsturctor(constructor);
+
+    constructor.contextTypes = {
+      ...constructor.contextTypes,
+      [CONTEXT_NAME]: PropTypes.object.isRequired,
+    };
+
+    constructor.prototype.componentWillMount = constructor.prototype.componentWillMount || emptyFunction;
+    constructor.prototype.__hohyhi__componentWillMount = constructor.prototype.componentWillMount;
+    constructor.prototype.componentWillMount = function () {
+      const store = getStoreFromComponentInstance(this);
+      if (store) {
+        this[name] = store;
       }
     };
 

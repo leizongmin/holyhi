@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Provider, subscribe } from '../../lib';
+import { Provider, subscribe, mapStore, Store } from '../../lib';
 import store from './store';
-import * as action from './action';
+import { playback, clearLogs } from './store';
 
 interface TodoListState {
   list: string[];
@@ -31,6 +31,7 @@ class TodoItem extends React.Component<TodoItemProps> {
   mapStore: 'store',
 })
 class TodoList extends React.Component<{}, TodoListState> {
+  store: Store;
   render() {
     console.log('Refresh TodoList');
     return (
@@ -40,7 +41,7 @@ class TodoList extends React.Component<{}, TodoListState> {
             key={index + '+' + item}
             message={item}
             index={index}
-            remove={() => action.removeItem(index)}
+            remove={() => this.store.action('removeItem', index)}
           />
         ))}
       </div>
@@ -48,14 +49,16 @@ class TodoList extends React.Component<{}, TodoListState> {
   }
 }
 
+@mapStore('store')
 class App extends React.Component {
+  store: Store;
   input: HTMLInputElement | null;
   add() {
     const input = this.input;
     if (input) {
       const msg = input.value;
       if (!msg) return;
-      action.addItem(msg);
+      this.store.action('addItem', msg);
       input.value = '';
     }
   }
@@ -63,6 +66,8 @@ class App extends React.Component {
     console.log('refresh App');
     return (
       <div className='app'>
+        <button onClick={playback}>Playback</button>
+        <button onClick={clearLogs}>clean logs</button>
         <div className='todo-input'>
           <input ref={(ref) => this.input = ref} onKeyPress={e => {
             if (e.charCode === 13) {

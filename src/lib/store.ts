@@ -195,12 +195,12 @@ export class StateField {
     return this;
   }
 
-  private getArray(): any[] | undefined {
+  private getArray(): any[] {
     const a = this.get() as any[];
     if (!Array.isArray(a)) {
       throw new TypeError(`state field "${this.name}" is not an array`);
     }
-    return a;
+    return a.slice();
   }
 
   public push(...items: any[]): this {
