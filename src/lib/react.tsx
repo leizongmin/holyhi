@@ -98,3 +98,48 @@ export class State extends React.Component<StateComponentProps> {
   }
 
 }
+
+
+export interface SubscribeDecoratorOptions {
+  fields?: string[];
+  mapState?: (state: any) => any;
+  mapStore?: string;
+}
+
+export function subscribe(options: SubscribeDecoratorOptions) {
+  const fields = options.fields || [];
+  const mapState = options.mapState || ((s) => s);
+  const mapStore = options.mapStore || '__holyhi__store';
+
+  return function (constructor: any) {
+    function emptyFunction() { /**/ }
+    function getStore(thisArgs: any): Store {
+      return thisArgs.context[CONTEXT_NAME] && thisArgs.context[CONTEXT_NAME].store;
+    }
+
+    constructor.contextTypes = {
+      ...constructor.contextTypes,
+      [CONTEXT_NAME]: PropTypes.object.isRequired,
+    };
+
+    constructor.prototype.componentWillMount = constructor.prototype.componentWillMount || emptyFunction;
+    constructor.prototype.__hohyhi__componentWillMount = constructor.prototype.componentWillMount;
+    constructor.prototype.componentWillMount = function () {
+      const store = getStore(this);
+      if (store) {
+        this[mapStore] = store;
+        this.__holyhi__subscribe = store.subscribe(fields, () => this.setState(mapState(store.getState()))).emit();
+      }
+    };
+
+    constructor.prototype.componentWillUnmount = constructor.prototype.componentWillUnmount || emptyFunction;
+    constructor.prototype.__hohyhi__componentWillUnmount = constructor.prototype.componentWillUnmount;
+    constructor.prototype.componentWillUnmount = function () {
+      if (this.__holyhi__subscribe) {
+        this.__holyhi__subscribe.unsubscribe();
+      }
+    };
+
+    return constructor;
+  };
+}
