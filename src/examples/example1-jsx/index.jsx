@@ -74,6 +74,7 @@ function saveStateToLocalStorage(state) {
 
 const store = createStore(loadStateFromLocalStorage());
 store.subscribe([], () => saveStateToLocalStorage(store.getState()));
+store.use(data => console.log(data));
 
 const app = ReactDOM.render((
   <App store={store} />

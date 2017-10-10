@@ -9,6 +9,20 @@ import * as immutable from 'immutable';
 // ```
 export type Listener = (fields: string[]) => void;
 
+export type Middleware = (data: LogInfo) => void;
+
+export type ActionHandler = (store: Store, params: any) => void;
+
+export const LOG_TYPE_ACTION = 'ACTION';
+export const LOG_TYPE_SET_STATE = 'SET_STATE';
+export const LOG_TYPE_STATE_CHANGE = 'STATE_CHANGE';
+export const LOG_TYPE_CURRENT_STATE = 'CURRENT_STATE';
+
+export interface LogInfo {
+  type: string;
+  payload: any;
+}
+
 // field name for all listeners
 export const LISTENER_ALL_FIELDS = '@@holyhi/ALL_FIELDS';
 
@@ -16,6 +30,8 @@ export class Store {
 
   protected state: immutable.Map<string, any>;
   protected listeners: Map<string, Listener[]> = new Map();
+  protected middlewares: Middleware[] = [];
+  protected actions: Map<string, ActionHandler> = new Map();
 
   constructor(initialState: any = {}) {
     this.state = immutable.fromJS(initialState);
@@ -25,7 +41,8 @@ export class Store {
     return this.state.toJS();
   }
 
-  public setState(state: any): void {
+  public setState(state: any): this {
+    this.log({ type: LOG_TYPE_SET_STATE, payload: { state } });
     let callbacks: Listener[] = this.listeners.get(LISTENER_ALL_FIELDS) || [];
     const fields: string[] = [];
 
@@ -38,12 +55,21 @@ export class Store {
         callbacks = callbacks.concat(list);
       }
     }
+
+    this.log({ type: LOG_TYPE_STATE_CHANGE, payload: { state, newState: newState.toJS() } });
     this.state = newState;
 
     if (callbacks.length > 0) {
       const list = new Set(callbacks);
       list.forEach(fn => fn(fields));
     }
+
+    return this;
+  }
+
+  protected log(info: LogInfo): this {
+    this.middlewares.forEach(fn => fn(info));
+    return this;
   }
 
   public field(name: string): StateField {
@@ -54,7 +80,7 @@ export class Store {
     return new Subscriber(this, fields).subscribe(callback);
   }
 
-  public addListener(fields: string[], callback: Listener): void {
+  public addListener(fields: string[], callback: Listener): this {
     for (const name of fields) {
       const list = this.listeners.get(name);
       if (Array.isArray(list)) {
@@ -65,9 +91,10 @@ export class Store {
         this.listeners.set(name, [callback]);
       }
     }
+    return this;
   }
 
-  public removeListener(fields: string[], callback: Listener): void {
+  public removeListener(fields: string[], callback: Listener): this {
     for (const name of fields) {
       const list = this.listeners.get(name);
       if (Array.isArray(list)) {
@@ -77,11 +104,35 @@ export class Store {
         }
       }
     }
+    return this;
+  }
+
+  public use(...handlers: Middleware[]): this {
+    this.middlewares.push(...handlers);
+    handlers.forEach(handler => handler({ type: LOG_TYPE_CURRENT_STATE, payload: { state: this.getState() } }));
+    return this;
+  }
+
+  public registerAction(name: string, handler: ActionHandler): this {
+    this.actions.set(name, handler);
+    return this;
+  }
+
+  public action(name: string, params?: any): this {
+    const handler = this.actions.get(name);
+    if (!handler) {
+      throw new Error(`action "${name}" is undefined`);
+    }
+    this.log({ type: LOG_TYPE_ACTION, payload: { name, params } });
+    handler(this, params);
+    return this;
   }
 
   public destroy(): void {
     delete this.state;
     delete this.listeners;
+    delete this.actions;
+    delete this.middlewares;
   }
 
 }

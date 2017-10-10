@@ -12,6 +12,7 @@ function saveStateToLocalStorage(state: any) {
 
 const store = createStore(loadStateFromLocalStorage());
 store.subscribe([], () => saveStateToLocalStorage(store.getState()));
+store.use(data => console.log(data));
 
 export default store;
 export { Store };

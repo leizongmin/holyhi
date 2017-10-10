@@ -32,7 +32,7 @@ describe('holyhi', function () {
     ]);
 
     s.destroy();
-    expect(() => s.setState({})).throws('Cannot read property \'get\' of undefined');
+    expect(() => s.setState({})).throws();
   });
 
   it('with initial state', function () {
@@ -67,19 +67,19 @@ describe('holyhi', function () {
       y: 124,
     });
     expect(fall).to.deep.equal([
-      [ 'x' ],
-      [ 'a' ],
-      [ 'b' ],
-      [ 'c' ],
-      [ 'y', 'b' ],
+      ['x'],
+      ['a'],
+      ['b'],
+      ['c'],
+      ['y', 'b'],
     ]);
     expect(fa).to.deep.equal([
-      [ 'a' ],
+      ['a'],
     ]);
     expect(fbc).to.deep.equal([
-      [ 'b' ],
-      [ 'c' ],
-      [ 'y', 'b' ],
+      ['b'],
+      ['c'],
+      ['y', 'b'],
     ]);
 
     sall.unsubscribe();
@@ -96,20 +96,20 @@ describe('holyhi', function () {
       y: 124,
     });
     expect(fall).to.deep.equal([
-      [ 'x' ],
-      [ 'a' ],
-      [ 'b' ],
-      [ 'c' ],
-      [ 'y', 'b' ],
+      ['x'],
+      ['a'],
+      ['b'],
+      ['c'],
+      ['y', 'b'],
     ]);
     expect(fa).to.deep.equal([
-      [ 'a' ],
-      [ 'a', 'c' ],
+      ['a'],
+      ['a', 'c'],
     ]);
     expect(fbc).to.deep.equal([
-      [ 'b' ],
-      [ 'c' ],
-      [ 'y', 'b' ],
+      ['b'],
+      ['c'],
+      ['y', 'b'],
     ]);
 
     sa.unsubscribe();
@@ -129,7 +129,7 @@ describe('holyhi', function () {
       s.setState({ b: 999 });
       s.setState({ a: 222 });
 
-      expect(ret).to.deep.equal([ 123, 666, 222 ]);
+      expect(ret).to.deep.equal([123, 666, 222]);
       expect(s.getState()).to.deep.equal({
         a: 222,
         b: 999,
@@ -188,6 +188,74 @@ describe('holyhi', function () {
       s.destroy();
     });
 
+  });
+
+  it('action', function () {
+    const s = createStore({ a: 111, b: [111] });
+
+    s.registerAction('add', (store, params) => {
+      store.field(params.name).add(params.number);
+    });
+    s.registerAction('sub', (store, params) => {
+      store.field(params.name).sub(params.number);
+    });
+
+    expect(() => s.action('hello')).to.throws(/action "hello" is undefined/);
+
+    s.action('add', { name: 'a', number: 10 });
+    expect(s.field('a').get()).to.equal(121);
+    s.action('sub', { name: 'a', number: 22 });
+    expect(s.field('a').get()).to.equal(99);
+
+    expect(s.getState()).to.deep.equal({ a: 99, b: [111] });
+
+    s.destroy();
+  });
+
+  it('middleware', function () {
+    const s = createStore({ a: 111, b: [111] });
+
+    const logs: any[] = [];
+    const logs2: any[] = [];
+    s.use(data => logs.push(data));
+    s.use(data => logs2.push(data));
+
+    s.registerAction('incr', (store, params) => {
+      store.field(params).sub(1);
+    });
+
+    s.action('incr', 'a');
+    s.field('a').add(20);
+    s.setState({ a: 444, c: 456 });
+
+    expect(logs).to.deep.equal(logs2);
+    expect(logs).to.deep.equal([{
+      type: 'CURRENT_STATE',
+      payload: { state: { a: 111, b: [111] } },
+    },
+    { type: 'ACTION', payload: { name: 'incr', params: 'a' } },
+    { type: 'SET_STATE', payload: { state: { a: 110 } } },
+    {
+      type: 'STATE_CHANGE',
+      payload: { state: { a: 110 }, newState: { a: 110, b: [111] } },
+    },
+    { type: 'SET_STATE', payload: { state: { a: 130 } } },
+    {
+      type: 'STATE_CHANGE',
+      payload: { state: { a: 130 }, newState: { a: 130, b: [111] } },
+    },
+    { type: 'SET_STATE', payload: { state: { a: 444, c: 456 } } },
+    {
+      type: 'STATE_CHANGE',
+      payload:
+      {
+        state: { a: 444, c: 456 },
+        newState: { a: 444, b: [111], c: 456 },
+      },
+    }]);
+    expect(s.getState()).to.deep.equal({ a: 444, b: [111], c: 456 });
+
+    s.destroy();
   });
 
 });
