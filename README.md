@@ -76,7 +76,7 @@ ReactDOM.render((
 // The new state maps to `this.state`
 // Maps the store to `this.store`
 @connect({
-  fields: ['a', 'b'],
+  subscribe: ['a', 'b'],
   mapStore: 'store',
 })
 class App extends React.Component {
