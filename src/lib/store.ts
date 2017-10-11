@@ -7,7 +7,7 @@ import * as immutable from 'immutable';
 //   console.log('the fields %s has bee changed", fields);
 // }
 // ```
-export type Listener = (fields: string[]) => void;
+export type Listener = (store: Store, fields: string[]) => void;
 
 export type Middleware = (data: LogInfo) => void;
 
@@ -61,7 +61,7 @@ export class Store {
 
     if (callbacks.length > 0) {
       const list = new Set(callbacks);
-      list.forEach(fn => fn(fields));
+      list.forEach(fn => fn(this, fields));
     }
 
     return this;
@@ -163,7 +163,7 @@ export class Subscriber {
   }
 
   public emit(fields: any[] = []): this {
-    this.callback(fields);
+    this.callback(this.store, fields);
     return this;
   }
 
