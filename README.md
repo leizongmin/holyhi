@@ -22,7 +22,7 @@
 
 # holyhi
 
-state management library that very easy to use
+State management library for React that very easy to use
 
 ## Installation
 
@@ -32,33 +32,34 @@ npm install holyhi --save
 
 ## Usage
 
-```typescript
+```js
 import { createStore } from 'holyhi';
 
-// create new store with initial state
+// Create a new store with an initial state
 const store = createStore({});
 
-// subscribe for fields changed
-const subscriber = store.subscribe(['a', 'b'], fields => {
+// Subscribe for the specified fields changed
+const subscriber = store.subscribe(['a', 'b'], (store, fields) => {
   console.log('fields changed: %s', fields);
+  console.log('new state: ', store.getState());
 });
 
-// change state
+// Change the state
 store.setState({
   a: 123,
   b: 456,
 });
 
-// unsubscribe
+// Unsubscribe and destroy
 subscriber.unsubscribe();
 ```
 
-React:
+React component:
 
-```tsx
+```jsx
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, Store, Provider, State } from 'holyhi';
+import { createStore, Provider, subscribe } from 'holyhi';
 
 const store = createStore({
   a: 123,
@@ -67,24 +68,19 @@ const store = createStore({
 });
 ReactDOM.render((
   <Provider store={store}>
-    <State
-      subscribe={['a', 'b']}
-      render={(state, store) => (
-        <App a={state.a} b={state.b} store={store} />
-      )}
-    />
     <App />
   </Provider>
 ), document.getElementById('root'));
 
-interface AppProps {
-  a: number;
-  b: number;
-  store: Store;
-}
-
-class App extends React.Component<AppProps> {
+// Use the `@subscribe` decorator to subscribe the `state changed` event
+// The new state maps to `this.state`
+@subscribe({
+  fields: ['a', 'b'],
+  mapStore: 'store',
+})
+class App extends React.Component {
   render() {
+    const state = this.state;
     return (
       <div>
         A: <input ref='a' />
@@ -97,7 +93,7 @@ class App extends React.Component<AppProps> {
   getResult() {
     const a = Number(this.refs.a.value);
     const b = Number(this.refs.a.value);
-    this.props.store.setState({ a, b });
+    this.store.setState({ a, b });
   }
 }
 ```
