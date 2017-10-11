@@ -9,7 +9,7 @@ export type Listener = (store: Store, fields: string[]) => void;
 
 export type Middleware = (data: LogInfo) => void;
 
-export type ActionHandler = (store: Store, params: any) => void;
+export type Reducer = (store: Store, params: any) => void;
 
 export type StateObject = Record<string, any>;
 
@@ -31,7 +31,7 @@ export class Store {
   protected state: StateObject;
   protected listeners: Map<string, Listener[]> = new Map();
   protected middlewares: Middleware[] = [];
-  protected actions: Map<string, ActionHandler> = new Map();
+  protected actions: Map<string, Reducer> = new Map();
 
   constructor(initialState: StateObject = {}) {
     this.state = { ...initialState };
@@ -107,24 +107,24 @@ export class Store {
     return this;
   }
 
-  public use(...handlers: Middleware[]): this {
-    this.middlewares.push(...handlers);
-    handlers.forEach(handler => handler({ type: LOG_TYPE_CURRENT_STATE, payload: { state: this.getState() } }));
+  public use(...middlewares: Middleware[]): this {
+    this.middlewares.push(...middlewares);
+    middlewares.forEach(handler => handler({ type: LOG_TYPE_CURRENT_STATE, payload: { state: this.getState() } }));
     return this;
   }
 
-  public registerAction(name: string, handler: ActionHandler): this {
-    this.actions.set(name, handler);
+  public registerAction(name: string, reducer: Reducer): this {
+    this.actions.set(name, reducer);
     return this;
   }
 
   public dispatch(action: string, params?: any): this {
-    const handler = this.actions.get(action);
-    if (!handler) {
+    const reducer = this.actions.get(action);
+    if (!reducer) {
       throw new Error(`action "${action}" is undefined`);
     }
     this.log({ type: LOG_TYPE_ACTION, payload: { action, params } });
-    handler(this, params);
+    reducer(this, params);
     return this;
   }
 
