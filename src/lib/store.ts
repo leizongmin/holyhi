@@ -118,12 +118,12 @@ export class Store {
     return this;
   }
 
-  public action(name: string, params?: any): this {
-    const handler = this.actions.get(name);
+  public dispatch(action: string, params?: any): this {
+    const handler = this.actions.get(action);
     if (!handler) {
-      throw new Error(`action "${name}" is undefined`);
+      throw new Error(`action "${action}" is undefined`);
     }
-    this.log({ type: LOG_TYPE_ACTION, payload: { name, params } });
+    this.log({ type: LOG_TYPE_ACTION, payload: { action, params } });
     handler(this, params);
     return this;
   }

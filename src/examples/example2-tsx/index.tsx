@@ -41,7 +41,7 @@ class TodoList extends React.Component<{}, TodoListState> {
             key={index + '+' + item}
             message={item}
             index={index}
-            remove={() => this.store.action('removeItem', index)}
+            remove={() => this.store.dispatch('removeItem', index)}
           />
         ))}
       </div>
@@ -60,7 +60,7 @@ class App extends React.Component {
     if (input) {
       const msg = input.value;
       if (!msg) return;
-      this.store.action('addItem', msg);
+      this.store.dispatch('addItem', msg);
       input.value = '';
     }
   }

@@ -200,11 +200,11 @@ describe('holyhi', function () {
       store.field(params.name).sub(params.number);
     });
 
-    expect(() => s.action('hello')).to.throws(/action "hello" is undefined/);
+    expect(() => s.dispatch('hello')).to.throws(/action "hello" is undefined/);
 
-    s.action('add', { name: 'a', number: 10 });
+    s.dispatch('add', { name: 'a', number: 10 });
     expect(s.field('a').get()).to.equal(121);
-    s.action('sub', { name: 'a', number: 22 });
+    s.dispatch('sub', { name: 'a', number: 22 });
     expect(s.field('a').get()).to.equal(99);
 
     expect(s.getState()).to.deep.equal({ a: 99, b: [111] });
@@ -224,7 +224,7 @@ describe('holyhi', function () {
       store.field(params).sub(1);
     });
 
-    s.action('incr', 'a');
+    s.dispatch('incr', 'a');
     s.field('a').add(20);
     s.setState({ a: 444, c: 456 });
 
@@ -233,7 +233,7 @@ describe('holyhi', function () {
       type: 'CURRENT_STATE',
       payload: { state: { a: 111, b: [111] } },
     },
-    { type: 'ACTION', payload: { name: 'incr', params: 'a' } },
+    { type: 'ACTION', payload: { action: 'incr', params: 'a' } },
     { type: 'SET_STATE', payload: { state: { a: 110 } } },
     {
       type: 'STATE_CHANGE',
