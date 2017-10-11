@@ -29,7 +29,7 @@ export interface LogInfo {
 }
 
 // field name for all listeners
-export const LISTENER_ALL_FIELDS = '@@holyhi/ALL_FIELDS';
+export const ALL_FIELDS_LISTENER = '@@holyhi/ALL_FIELDS';
 
 export class Store {
 
@@ -48,7 +48,7 @@ export class Store {
 
   public setState(state: StateObject): this {
     this.log({ type: LOG_TYPE_SET_STATE, payload: { state } });
-    let callbacks: Listener[] = this.listeners.get(LISTENER_ALL_FIELDS) || [];
+    let callbacks: Listener[] = this.listeners.get(ALL_FIELDS_LISTENER) || [];
     const fields: string[] = [];
 
     const newState = { ...this.state };
@@ -149,7 +149,7 @@ export class Subscriber {
   private callback: Listener;
 
   constructor(private store: Store, fields: string[]) {
-    this.fields = fields.length > 0 ? fields.slice() : [LISTENER_ALL_FIELDS];
+    this.fields = fields.length > 0 ? fields.slice() : [ALL_FIELDS_LISTENER];
   }
 
   public subscribe(callback: Listener): this {
