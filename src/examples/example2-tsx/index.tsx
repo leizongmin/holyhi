@@ -38,7 +38,7 @@ class TodoList extends React.Component<{}, TodoListState> {
       <div className='todo-list'>
         {this.state.list.map((item, index) => (
           <TodoItem
-            key={index + '+' + item}
+            key={index}
             message={item}
             index={index}
             remove={() => this.store.dispatch({ type: 'removeItem', index })}
@@ -88,5 +88,5 @@ const app = ReactDOM.render((
   <Provider store={store}>
     <App />
   </Provider>
-), document.getElementById('root'));
+), document.getElementById('app'));
 (window as any).app = app;

@@ -42,7 +42,7 @@ class TodoList extends React.Component<Props, TodoListState> {
       <div className='todo-list'>
         {this.state.list.map((item, index) => <TodoItem
           store={this.props.store}
-          key={index + item}
+          key={index}
           message={item}
           index={index}
         />)}
@@ -92,5 +92,5 @@ store.use(data => console.log(data));
 
 const app = ReactDOM.render((
   <App store={store} />
-), document.getElementById('root'));
+), document.getElementById('app'));
 (window as any).app = app;
