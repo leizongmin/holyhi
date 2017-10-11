@@ -193,10 +193,10 @@ describe('holyhi', function () {
   it('action', function () {
     const s = createStore({ a: 111, b: [111] });
 
-    s.registerAction('add', (store, action) => {
+    s.register('add', (store, action) => {
       store.field(action.name).add(action.number);
     });
-    s.registerAction('sub', (store, action) => {
+    s.register('sub', (store, action) => {
       store.field(action.name).sub(action.number);
     });
 
@@ -220,7 +220,7 @@ describe('holyhi', function () {
     s.use(data => logs.push(data));
     s.use(data => logs2.push(data));
 
-    s.registerAction('incr', (store, action) => {
+    s.register('incr', (store, action) => {
       store.field(action.name).sub(1);
     });
 

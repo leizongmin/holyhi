@@ -36,7 +36,7 @@ export class Store {
   protected state: StateObject;
   protected listeners: Map<string, Listener[]> = new Map();
   protected middlewares: Middleware[] = [];
-  protected actions: Map<string, Reducer> = new Map();
+  protected reducers: Map<string, Reducer> = new Map();
 
   constructor(initialState: StateObject = {}) {
     this.state = { ...initialState };
@@ -118,13 +118,13 @@ export class Store {
     return this;
   }
 
-  public registerAction(name: string, reducer: Reducer): this {
-    this.actions.set(name, reducer);
+  public register(actionType: string, reducer: Reducer): this {
+    this.reducers.set(actionType, reducer);
     return this;
   }
 
   public dispatch(action: ActionObject): this {
-    const reducer = this.actions.get(action.type);
+    const reducer = this.reducers.get(action.type);
     if (!reducer) {
       throw new Error(`action type "${action.type}" is undefined`);
     }
@@ -136,7 +136,7 @@ export class Store {
   public destroy(): void {
     delete this.state;
     delete this.listeners;
-    delete this.actions;
+    delete this.reducers;
     delete this.middlewares;
   }
 
