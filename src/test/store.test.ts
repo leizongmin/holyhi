@@ -193,18 +193,18 @@ describe('holyhi', function () {
   it('action', function () {
     const s = createStore({ a: 111, b: [111] });
 
-    s.registerAction('add', (store, params) => {
-      store.field(params.name).add(params.number);
+    s.registerAction('add', (store, action) => {
+      store.field(action.name).add(action.number);
     });
-    s.registerAction('sub', (store, params) => {
-      store.field(params.name).sub(params.number);
+    s.registerAction('sub', (store, action) => {
+      store.field(action.name).sub(action.number);
     });
 
-    expect(() => s.dispatch('hello')).to.throws(/action "hello" is undefined/);
+    expect(() => s.dispatch({ type: 'hello' })).to.throws(/action type "hello" is undefined/);
 
-    s.dispatch('add', { name: 'a', number: 10 });
+    s.dispatch({ type: 'add', name: 'a', number: 10 });
     expect(s.field('a').get()).to.equal(121);
-    s.dispatch('sub', { name: 'a', number: 22 });
+    s.dispatch({ type: 'sub', name: 'a', number: 22 });
     expect(s.field('a').get()).to.equal(99);
 
     expect(s.getState()).to.deep.equal({ a: 99, b: [111] });
@@ -220,11 +220,11 @@ describe('holyhi', function () {
     s.use(data => logs.push(data));
     s.use(data => logs2.push(data));
 
-    s.registerAction('incr', (store, params) => {
-      store.field(params).sub(1);
+    s.registerAction('incr', (store, action) => {
+      store.field(action.name).sub(1);
     });
 
-    s.dispatch('incr', 'a');
+    s.dispatch({ type: 'incr', name: 'a'});
     s.field('a').add(20);
     s.setState({ a: 444, c: 456 });
 
@@ -233,7 +233,7 @@ describe('holyhi', function () {
       type: 'CURRENT_STATE',
       payload: { state: { a: 111, b: [111] } },
     },
-    { type: 'ACTION', payload: { action: 'incr', params: 'a' } },
+    { type: 'ACTION', payload: { type: 'incr', name: 'a' } },
     { type: 'SET_STATE', payload: { state: { a: 110 } } },
     {
       type: 'STATE_CHANGE',

@@ -15,12 +15,12 @@ const store = createStore(loadStateFromLocalStorage('state', { list: [] }));
 store.subscribe([], () => saveStateToLocalStorage('state', store.getState()));
 store.use(data => console.log(data));
 
-store.registerAction('addItem', (store, msg) => {
-  store.field('list').unshift(msg);
+store.registerAction('addItem', (store, action) => {
+  store.field('list').unshift(action.msg);
 });
 
-store.registerAction('removeItem', (store, index) => {
-  store.field('list').splice(index, 1);
+store.registerAction('removeItem', (store, action) => {
+  store.field('list').splice(action.index, 1);
 });
 
 const global = window as any;

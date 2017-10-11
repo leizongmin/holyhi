@@ -9,9 +9,14 @@ export type Listener = (store: Store, fields: string[]) => void;
 
 export type Middleware = (data: LogInfo) => void;
 
-export type Reducer = (store: Store, params: any) => void;
+export type Reducer = (store: Store, action: ActionObject) => void;
 
 export type StateObject = Record<string, any>;
+
+export interface ActionObject {
+  type: string;
+  [key: string]: any;
+}
 
 export const LOG_TYPE_ACTION = 'ACTION';
 export const LOG_TYPE_SET_STATE = 'SET_STATE';
@@ -41,7 +46,7 @@ export class Store {
     return { ...this.state };
   }
 
-  public setState(state: any): this {
+  public setState(state: StateObject): this {
     this.log({ type: LOG_TYPE_SET_STATE, payload: { state } });
     let callbacks: Listener[] = this.listeners.get(LISTENER_ALL_FIELDS) || [];
     const fields: string[] = [];
@@ -118,13 +123,13 @@ export class Store {
     return this;
   }
 
-  public dispatch(action: string, params?: any): this {
-    const reducer = this.actions.get(action);
+  public dispatch(action: ActionObject): this {
+    const reducer = this.actions.get(action.type);
     if (!reducer) {
-      throw new Error(`action "${action}" is undefined`);
+      throw new Error(`action type "${action.type}" is undefined`);
     }
-    this.log({ type: LOG_TYPE_ACTION, payload: { action, params } });
-    reducer(this, params);
+    this.log({ type: LOG_TYPE_ACTION, payload: action });
+    reducer(this, action);
     return this;
   }
 
@@ -162,14 +167,14 @@ export class Subscriber {
     delete this.listening;
   }
 
-  public emit(fields: any[] = []): this {
+  public emit(fields: string[] = []): this {
     this.callback(this.store, fields);
     return this;
   }
 
 }
 
-export function createStore(initialState: any = {}): Store {
+export function createStore(initialState: StateObject = {}): Store {
   return new Store(initialState);
 }
 
