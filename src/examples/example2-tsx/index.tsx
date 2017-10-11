@@ -1,10 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, Store, Provider, State } from '../../lib';
+import { Provider, connect, Store } from '../../lib';
+import store from './store';
+import { playback, clearLogs } from './store';
 
-interface TodoListProps {
+interface TodoListState {
   list: string[];
-  removeItem: (index: number) => void;
 }
 
 interface TodoItemProps {
@@ -24,16 +25,23 @@ class TodoItem extends React.Component<TodoItemProps> {
   }
 }
 
-class TodoList extends React.Component<TodoListProps, {}> {
+@connect({
+  subscribe: ['list'],
+  mapState: (state) => ({ list: state.list }),
+  mapStore: 'store',
+})
+class TodoList extends React.Component<{}, TodoListState> {
+  store: Store;
   render() {
+    console.log('Refresh TodoList');
     return (
       <div className='todo-list'>
-        {this.props.list.map((item, index) => (
+        {this.state.list.map((item, index) => (
           <TodoItem
             key={index + '+' + item}
             message={item}
             index={index}
-            remove={() => this.props.removeItem(index)}
+            remove={() => this.store.action('removeItem', index)}
           />
         ))}
       </div>
@@ -41,63 +49,40 @@ class TodoList extends React.Component<TodoListProps, {}> {
   }
 }
 
+@connect({
+  mapStore: 'store',
+})
 class App extends React.Component {
-  public input: HTMLInputElement | null;
+  store: Store;
+  input: HTMLInputElement | null;
+  add() {
+    const input = this.input;
+    if (input) {
+      const msg = input.value;
+      if (!msg) return;
+      this.store.action('addItem', msg);
+      input.value = '';
+    }
+  }
   render() {
     console.log('refresh App');
-    const add = (store: Store) => {
-      const input = this.input;
-      if (input) {
-        const msg = input.value;
-        if (!msg) return;
-        store.field('list').unshift(msg);
-        input.value = '';
-      }
-    };
     return (
       <div className='app'>
-        <State
-          noSubscribe={true}
-          render={(state, store) => (
-            console.log('refresh todo-input'),
-            <div className='todo-input'>
-              <input ref={(ref) => this.input = ref} onKeyPress={e => {
-                if (e.charCode === 13) {
-                  add(store);
-                }
-              }} />
-              <button onClick={() => add(store)}>Add</button>
-            </div>
-          )}
-        />
-        <State
-          subscribe={['list']}
-          render={(state, store) => (
-            console.log('refresh TodoList'),
-            <TodoList
-              list={state.list}
-              removeItem={(i) => store.field('list').splice(i, 1)}
-            />
-          )}
-        />
+        <button onClick={playback}>Playback</button>
+        <button onClick={clearLogs}>clean logs</button>
+        <div className='todo-input'>
+          <input ref={(ref) => this.input = ref} onKeyPress={e => {
+            if (e.charCode === 13) {
+              this.add();
+            }
+          }} />
+          <button onClick={() => this.add()}>Add</button>
+        </div>
+        <TodoList />
       </div>
     );
   }
 }
-
-function loadStateFromLocalStorage(): any {
-  return localStorage.getItem('state')
-    ? JSON.parse(localStorage.getItem('state') || '{}')
-    : { list: [] };
-}
-
-function saveStateToLocalStorage(state: any) {
-  localStorage.setItem('state', JSON.stringify(state));
-}
-
-const store = createStore(loadStateFromLocalStorage());
-store.subscribe([], () => saveStateToLocalStorage(store.getState()));
-store.use(data => console.log(data));
 
 const app = ReactDOM.render((
   <Provider store={store}>

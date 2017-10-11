@@ -4,10 +4,7 @@ module.exports = {
   entry: {
     'example1-jsx': './example1-jsx/index.jsx',
     'example1-tsx': './example1-tsx/index.tsx',
-    'example2-jsx': './example2-jsx/index.jsx',
     'example2-tsx': './example2-tsx/index.tsx',
-    'example3-tsx': './example3-tsx/index.tsx',
-    'example4-tsx': './example4-tsx/index.tsx',
   },
   output: {
     path: __dirname,
