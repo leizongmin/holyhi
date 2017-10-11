@@ -59,7 +59,7 @@ React component:
 ```jsx
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, Provider, subscribe } from 'holyhi';
+import { createStore, Provider, connect } from 'holyhi';
 
 const store = createStore({
   a: 123,
@@ -74,7 +74,8 @@ ReactDOM.render((
 
 // Use the `@subscribe` decorator to subscribe the `state changed` event
 // The new state maps to `this.state`
-@subscribe({
+// Maps the store to `this.store`
+@connect({
   fields: ['a', 'b'],
   mapStore: 'store',
 })
