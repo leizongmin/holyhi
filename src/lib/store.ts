@@ -1,5 +1,3 @@
-import * as immutable from 'immutable';
-
 // listener callback function
 // example:
 // ```
@@ -12,6 +10,8 @@ export type Listener = (store: Store, fields: string[]) => void;
 export type Middleware = (data: LogInfo) => void;
 
 export type ActionHandler = (store: Store, params: any) => void;
+
+export type StateObject = Record<string, any>;
 
 export const LOG_TYPE_ACTION = 'ACTION';
 export const LOG_TYPE_SET_STATE = 'SET_STATE';
@@ -28,17 +28,17 @@ export const LISTENER_ALL_FIELDS = '@@holyhi/ALL_FIELDS';
 
 export class Store {
 
-  protected state: immutable.Map<string, any>;
+  protected state: StateObject;
   protected listeners: Map<string, Listener[]> = new Map();
   protected middlewares: Middleware[] = [];
   protected actions: Map<string, ActionHandler> = new Map();
 
-  constructor(initialState: any = {}) {
-    this.state = immutable.fromJS(initialState);
+  constructor(initialState: StateObject = {}) {
+    this.state = { ...initialState };
   }
 
   public getState(): any {
-    return this.state.toJS();
+    return { ...this.state };
   }
 
   public setState(state: any): this {
@@ -46,17 +46,17 @@ export class Store {
     let callbacks: Listener[] = this.listeners.get(LISTENER_ALL_FIELDS) || [];
     const fields: string[] = [];
 
-    let newState = this.state;
+    const newState = { ...this.state };
     for (const name in state) {
       fields.push(name);
-      newState = newState.set(name, state[name]);
+      newState[name] = state[name];
       const list = this.listeners.get(name);
       if (Array.isArray(list)) {
         callbacks = callbacks.concat(list);
       }
     }
 
-    this.log({ type: LOG_TYPE_STATE_CHANGE, payload: { state, newState: newState.toJS() } });
+    this.log({ type: LOG_TYPE_STATE_CHANGE, payload: { state, newState: { ...newState } } });
     this.state = newState;
 
     if (callbacks.length > 0) {

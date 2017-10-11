@@ -8,9 +8,7 @@
     "dist/lib"
   ],
   "dependencies": {
-    "@types/immutable": "^3.8.7",
     "@types/prop-types": "^15.5.2",
-    "immutable": "^3.8.2",
     "prop-types": "^15.6.0"
   },
   "devDependencies": {
