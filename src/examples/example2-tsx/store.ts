@@ -46,7 +46,7 @@ async function playback() {
   await array(logs).forEach(async (item: LogInfo, index) => {
     if (item.type === LOG_TYPE_CURRENT_STATE || item.type === LOG_TYPE_SET_STATE) {
       console.log('playback #%s', index);
-      store.setState(item.payload.state);
+      store.setState(item.payload.state || item.payload.partial);
       await sleep(1000);
     }
   });

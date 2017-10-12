@@ -46,22 +46,22 @@ export class Store {
     return { ...this.state };
   }
 
-  public setState(state: StateObject): this {
-    this.log({ type: LOG_TYPE_SET_STATE, payload: { state } });
+  public setState(partial: StateObject): this {
+    this.log({ type: LOG_TYPE_SET_STATE, payload: { partial } });
     let callbacks: Listener[] = this.listeners.get(ALL_FIELDS_LISTENER) || [];
     const fields: string[] = [];
 
     const newState = { ...this.state };
-    for (const name in state) {
+    for (const name in partial) {
       fields.push(name);
-      newState[name] = state[name];
+      newState[name] = partial[name];
       const list = this.listeners.get(name);
       if (Array.isArray(list)) {
         callbacks = callbacks.concat(list);
       }
     }
 
-    this.log({ type: LOG_TYPE_STATE_CHANGE, payload: { state, newState: { ...newState } } });
+    this.log({ type: LOG_TYPE_STATE_CHANGE, payload: { state: { ...newState } } });
     this.state = newState;
 
     if (callbacks.length > 0) {

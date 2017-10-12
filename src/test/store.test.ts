@@ -234,23 +234,22 @@ describe('store', function () {
       payload: { state: { a: 111, b: [111] } },
     },
     { type: 'ACTION', payload: { type: 'incr', name: 'a' } },
-    { type: 'SET_STATE', payload: { state: { a: 110 } } },
+    { type: 'SET_STATE', payload: { partial: { a: 110 } } },
     {
       type: 'STATE_CHANGE',
-      payload: { state: { a: 110 }, newState: { a: 110, b: [111] } },
+      payload: { state: { a: 110, b: [111] } },
     },
-    { type: 'SET_STATE', payload: { state: { a: 130 } } },
+    { type: 'SET_STATE', payload: { partial: { a: 130 } } },
     {
       type: 'STATE_CHANGE',
-      payload: { state: { a: 130 }, newState: { a: 130, b: [111] } },
+      payload: { state: { a: 130, b: [111] } },
     },
-    { type: 'SET_STATE', payload: { state: { a: 444, c: 456 } } },
+    { type: 'SET_STATE', payload: { partial: { a: 444, c: 456 } } },
     {
       type: 'STATE_CHANGE',
       payload:
       {
-        state: { a: 444, c: 456 },
-        newState: { a: 444, b: [111], c: 456 },
+        state: { a: 444, b: [111], c: 456 },
       },
     }]);
     expect(s.getState()).to.deep.equal({ a: 444, b: [111], c: 456 });
