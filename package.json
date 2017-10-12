@@ -1,6 +1,6 @@
 {
   "name": "holyhi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "State management library for React that very easy to use",
   "main": "dist/lib/index.js",
   "typing": "dist/lib/index.d.ts",
