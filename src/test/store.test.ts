@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { createStore } from '../lib';
 
-describe('holyhi', function () {
+describe('store', function () {
 
   it('no initial state', function () {
     const s = createStore();
