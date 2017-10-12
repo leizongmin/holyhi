@@ -18,10 +18,10 @@ class TodoItem extends React.Component {
 class TodoList extends React.Component {
   componentWillMount() {
     const update = () => this.setState({ list: this.props.store.field('list').get() });
-    this.subscriber = this.props.store.subscribe(['list'], update).emit();
+    this.observer = this.props.store.subscribe(['list'], update).emit();
   }
   componentWillUnmount() {
-    this.subscriber.unsubscribe();
+    this.observer.unsubscribe();
   }
   render() {
     return (

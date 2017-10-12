@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { createStore, Store, Subscriber } from '../../lib';
+import { createStore, Store, Observable } from '../../lib';
 
 interface Props {
   store: Store;
@@ -29,13 +29,13 @@ class TodoItem extends React.Component<TodoItemProps> {
 }
 
 class TodoList extends React.Component<Props, TodoListState> {
-  private subscriber: Subscriber;
+  private observer: Observable;
   componentWillMount() {
     const update = () => this.setState({ list: this.props.store.field('list').get() });
-    this.subscriber = this.props.store.subscribe(['list'], update).emit();
+    this.observer = this.props.store.subscribe(['list'], update).emit();
   }
   componentWillUnmount() {
-    this.subscriber.unsubscribe();
+    this.observer.unsubscribe();
   }
   render() {
     return (

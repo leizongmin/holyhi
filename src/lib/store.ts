@@ -81,8 +81,8 @@ export class Store {
     return new StateField(this, name);
   }
 
-  public subscribe(fields: string[], callback: Listener): Subscriber {
-    return new Subscriber(this, fields).subscribe(callback);
+  public subscribe(fields: string[], callback: Listener): Observable {
+    return new Observable(this, fields).subscribe(callback);
   }
 
   public addListener(fields: string[], callback: Listener): this {
@@ -142,7 +142,7 @@ export class Store {
 
 }
 
-export class Subscriber {
+export class Observable {
 
   public listening: boolean = false;
   private fields: string[];
@@ -182,7 +182,7 @@ export class StateField {
 
   constructor(private store: Store, public name: string) { }
 
-  public subscribe(callback: (newValue: any) => void): Subscriber {
+  public subscribe(callback: (newValue: any) => void): Observable {
     return this.store.subscribe([this.name], () => callback(this.get()));
   }
 

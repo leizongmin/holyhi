@@ -74,7 +74,7 @@ export function connect(options: ConnectDecoratorOptions) {
       if (store) {
         this[mapStore] = store;
         if (enableSubscribe) {
-          this.__holyhi__subscribe = store.subscribe(fields, () => this.setState(mapState(store.getState()))).emit();
+          this.__holyhi__observer = store.subscribe(fields, () => this.setState(mapState(store.getState()))).emit();
         }
       }
       this.__hohyhi__origin_componentWillMount();
@@ -83,8 +83,8 @@ export function connect(options: ConnectDecoratorOptions) {
     constructor.prototype.componentWillUnmount = constructor.prototype.componentWillUnmount || emptyFunction;
     constructor.prototype.__hohyhi__origin_componentWillUnmount = constructor.prototype.componentWillUnmount;
     constructor.prototype.componentWillUnmount = function () {
-      if (this.__holyhi__subscribe) {
-        this.__holyhi__subscribe.unsubscribe();
+      if (this.__holyhi__observer) {
+        this.__holyhi__observer.unsubscribe();
       }
       this.__hohyhi__origin_componentWillUnmount();
     };
