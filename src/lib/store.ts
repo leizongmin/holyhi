@@ -146,29 +146,29 @@ export class Observable {
 
   public listening: boolean = false;
   private fields: string[];
-  private callback: Listener;
+  private listener: Listener;
 
   constructor(private store: Store, fields: string[]) {
     this.fields = fields.length > 0 ? fields.slice() : [ALL_FIELDS_LISTENER];
   }
 
-  public subscribe(callback: Listener): this {
-    this.callback = callback;
-    this.store.addListener(this.fields, this.callback);
+  public subscribe(listener: Listener): this {
+    this.listener = listener;
+    this.store.addListener(this.fields, this.listener);
     this.listening = true;
     return this;
   }
 
   public unsubscribe(): void {
-    this.store.removeListener(this.fields, this.callback);
+    this.store.removeListener(this.fields, this.listener);
     delete this.store;
-    delete this.callback;
+    delete this.listener;
     delete this.fields;
     delete this.listening;
   }
 
   public emit(fields: string[] = []): this {
-    this.callback(this.store, fields);
+    this.listener(this.store, fields);
     return this;
   }
 
