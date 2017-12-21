@@ -22,6 +22,8 @@
 
 # holyhi
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/leizongmin/holyhi.svg)](https://greenkeeper.io/)
+
 State management library for React that very easy to use
 
 ## Installation
