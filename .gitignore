@@ -59,3 +59,4 @@ typings/
 
 dist
 src/examples/**/entry.js
+package-lock.json
